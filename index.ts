@@ -1,7 +1,8 @@
 import express, { json } from "express";
 import cors from "cors";
 import 'express-async-errors';
-import {handleError, ValidationError} from "./utils/errors";
+import rateLimit from "express-rate-limit";
+import {handleError} from "./utils/errors";
 
 const app = express();
 
@@ -9,6 +10,10 @@ app.use(cors({
     origin: 'http://localhost:3000',
 }));
 app.use(json());
+app.use(rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 100, // Limit each IP to 100 request per `window` (here per 5 minutes)
+}))
 
 //Routes...
 
