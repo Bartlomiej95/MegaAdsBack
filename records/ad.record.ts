@@ -1,9 +1,9 @@
-import {AdEntity} from "../types";
+import {AdEntity, NewAdEntity} from "../types";
 import {ValidationError} from "../utils/errors";
+import {pool} from "../utils/db";
+import {FieldPacket} from "mysql2";
 
-interface NewAdEntity extends Omit<AdEntity, 'id'> {
-    id?: string;
-}
+type AdRecordResults = [AdEntity[], FieldPacket[]];
 
 export class AdRecord implements AdEntity {
     id: string;
@@ -40,5 +40,20 @@ export class AdRecord implements AdEntity {
         if(typeof obj.lat !== 'number' || typeof obj.lon !== 'number') {
             throw new ValidationError('Nie można zlokalizować ogłoszenia')
         }
+        this.id = obj.id;
+        this.name = obj.name;
+        this.url = obj.url;
+        this.lat = obj.lat;
+        this.lon = obj.lon;
+        this.description = obj.description;
+        this.price = obj.price
+    }
+
+    static async getOne(id: string): Promise<AdRecord | null> {
+        const [results] = await pool.execute("SELECT * FROM `ads` WHERE id=:id", {
+            id,
+        }) as AdRecordResults;
+
+        return results.length === 0 ? null : new AdRecord(results[0]);
     }
 }
