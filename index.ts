@@ -1,4 +1,4 @@
-import express, { json } from "express";
+import express, {json, Router} from "express";
 import cors from "cors";
 import 'express-async-errors';
 import rateLimit from "express-rate-limit";
@@ -16,7 +16,9 @@ app.use(rateLimit({
     max: 100, // Limit each IP to 100 request per `window` (here per 5 minutes)
 }))
 
-app.use('/ad', adRouter)
+const router = Router();
+
+router.use('/ad', adRouter)
 
 app.use(handleError)
 
